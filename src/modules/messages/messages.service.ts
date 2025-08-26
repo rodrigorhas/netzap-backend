@@ -1,32 +1,28 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
+import { ChatMessage, ChatGroup } from '../whatsapp/types';
 
 @Injectable()
 export class MessagesService {
-  private readonly logger = new Logger(MessagesService.name);
-
   constructor(private readonly whatsappService: WhatsappService) {}
 
-  getChatMessages(chatId: string) {
+  getChatMessages(chatId: string): ChatMessage[] {
     return this.whatsappService.getChatMessages(chatId);
   }
 
-  getChatGroups() {
+  getChatGroups(): ChatGroup[] {
     return this.whatsappService.getChatGroups();
   }
 
-  getLastMessageId() {
+  getLastMessageId(): string | null {
     return this.whatsappService.getLastMessageId();
   }
 
   async sendMessage(to: string, message: string) {
-    this.logger.log(`Enviando mensagem para: ${to}`);
-    const sentMessage = await this.whatsappService.sendMessage(to, message);
-    this.logger.log('Mensagem enviada com sucesso:', sentMessage.id?._serialized);
-    return sentMessage;
+    return await this.whatsappService.sendMessage(to, message);
   }
 
-  markChatAsRead(chatId: string) {
+  markChatAsRead(chatId: string): void {
     this.whatsappService.markChatAsRead(chatId);
   }
 }

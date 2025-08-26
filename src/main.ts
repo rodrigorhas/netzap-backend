@@ -2,15 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { getCorsConfig } from './config/cors.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // CORS
-  app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
-  });
+  // CORS - Configuração centralizada
+  app.enableCors(getCorsConfig());
   
   // Validation
   app.useGlobalPipes(new ValidationPipe({
@@ -33,5 +31,6 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`🚀 NetZap API rodando na porta ${port}`);
   console.log(`📚 Documentação disponível em http://localhost:${port}/api`);
+  console.log(`🌐 CORS configurado e ativo`);
 }
 bootstrap();

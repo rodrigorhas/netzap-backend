@@ -2,28 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Chat, Client, LocalAuth, Message } from 'whatsapp-web.js';
 import * as qrcode from 'qrcode';
 import { EventEmitter } from 'events';
-
-interface ChatMessage {
-  id: string;
-  from: string;
-  to: string;
-  body: string;
-  timestamp: number;
-  type: string;
-  isFromMe: boolean;
-  chatId: string;
-  chatName: string;
-  isGroup: boolean;
-}
-
-interface ChatGroup {
-  chatId: string;
-  chatName: string;
-  isGroup: boolean;
-  messages: ChatMessage[];
-  lastMessage: ChatMessage | null;
-  unreadCount: number;
-}
+import { ChatMessage, ChatGroup } from './types';
 
 @Injectable()
 export class WhatsappService extends EventEmitter {
