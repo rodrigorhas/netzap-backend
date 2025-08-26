@@ -10,11 +10,17 @@ async function bootstrap() {
   // CORS - Configuração centralizada
   app.enableCors(getCorsConfig());
   
-  // Validation
+  // Validation - Configuração mais flexível em desenvolvimento
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
-    forbidNonWhitelisted: true,
+    forbidNonWhitelisted: process.env.NODE_ENV === 'production',
     transform: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    skipMissingProperties: false,
+    skipNullProperties: false,
+    skipUndefinedProperties: false,
   }));
   
   // Swagger

@@ -1,10 +1,7 @@
 import { Controller, Get, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { WhatsappService } from './whatsapp.service';
-
-class InitializeDto {
-  action: 'initialize' | 'logout';
-}
+import { InitializeDto } from './dto/initialize.dto';
 
 @ApiTags('WhatsApp')
 @Controller('whatsapp')
@@ -20,11 +17,13 @@ export class WhatsappController {
       const isInitializing = this.whatsappService.getIsInitializing();
       const qrCode = this.whatsappService.getQRCode();
       
+      // Verificar se há informações de loading disponíveis
       let loadingPercent, loadingMessage;
       if (isInitializing && !isReady) {
+        // Simular progresso de loading baseado no tempo de inicialização
         const startTime = Date.now();
         const elapsed = Date.now() - startTime;
-        loadingPercent = Math.min(Math.floor(elapsed / 100), 95);
+        loadingPercent = Math.min(Math.floor(elapsed / 100), 95); // Máximo 95% até estar pronto
         loadingMessage = 'Conectando ao WhatsApp...';
       }
       
@@ -55,6 +54,9 @@ export class WhatsappController {
       
       switch (action) {
         case 'initialize':
+          console.log('Inicializando WhatsApp via API...');
+          
+          // Verificar se já está inicializando
           if (this.whatsappService.getIsInitializing()) {
             return { 
               success: true, 
@@ -62,6 +64,7 @@ export class WhatsappController {
             };
           }
           
+          // Verificar se já está pronto
           if (this.whatsappService.isClientReady()) {
             return { 
               success: true, 
@@ -69,18 +72,35 @@ export class WhatsappController {
             };
           }
           
-          await this.whatsappService.initialize();
-          return { 
-            success: true, 
-            message: 'WhatsApp inicializado com sucesso' 
-          };
+          try {
+            await this.whatsappService.initialize();
+            return { 
+              success: true, 
+              message: 'WhatsApp inicializado com sucesso' 
+            };
+          } catch (initError) {
+            console.error('Erro na inicialização:', initError);
+            throw new HttpException({ 
+              success: false, 
+              error: initError instanceof Error ? initError.message : 'Erro na inicialização' 
+            }, HttpStatus.INTERNAL_SERVER_ERROR);
+          }
         
         case 'logout':
-          await this.whatsappService.logout();
-          return { 
-            success: true, 
-            message: 'WhatsApp desconectado com sucesso' 
-          };
+          console.log('Desconectando WhatsApp via API...');
+          try {
+            await this.whatsappService.logout();
+            return { 
+              success: true, 
+              message: 'WhatsApp desconectado com sucesso' 
+            };
+          } catch (logoutError) {
+            console.error('Erro no logout:', logoutError);
+            throw new HttpException({ 
+              success: false, 
+              error: logoutError instanceof Error ? logoutError.message : 'Erro no logout' 
+            }, HttpStatus.INTERNAL_SERVER_ERROR);
+          }
         
         default:
           throw new HttpException(
@@ -89,6 +109,9 @@ export class WhatsappController {
           );
       }
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         { 
           success: false, 

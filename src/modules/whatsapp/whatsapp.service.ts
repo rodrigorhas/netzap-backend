@@ -130,7 +130,13 @@ export class WhatsappService extends EventEmitter {
 
   async logout(): Promise<void> {
     this.logger.log('Desconectando WhatsApp...');
-    await this.client.destroy();
+    
+    try {
+      await this.client.destroy();
+    } catch (error) {
+      this.logger.error('Erro ao desconectar WhatsApp:', error);
+    }
+
     this.isReady = false;
     this.isInitializing = false;
     this.qrCode = null;
@@ -156,7 +162,14 @@ export class WhatsappService extends EventEmitter {
   }
 
   getChatGroups(): ChatGroup[] {
-    return Array.from(this.chatGroups.values());
+    return Array.from(this.chatGroups.values())
+      .sort((a, b) => {
+        // Ordenar por última mensagem (mais recentes primeiro)
+        if (!a.lastMessage && !b.lastMessage) return 0;
+        if (!a.lastMessage) return 1;
+        if (!b.lastMessage) return -1;
+        return b.lastMessage.timestamp - a.lastMessage.timestamp;
+      });
   }
 
   getChatMessages(chatId: string): ChatMessage[] {
@@ -176,10 +189,10 @@ export class WhatsappService extends EventEmitter {
   }
 
   markChatAsRead(chatId: string): void {
-    if (!this.isReady) {
-      return;
+    const chatGroup = this.chatGroups.get(chatId);
+    if (chatGroup) {
+      chatGroup.unreadCount = 0;
     }
-    this.client.sendSeen(chatId);
   }
 
   private async loadExistingMessages(): Promise<void> {

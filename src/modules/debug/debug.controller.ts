@@ -12,7 +12,31 @@ export class DebugController {
   @ApiResponse({ status: 200, description: 'Informações de debug retornadas com sucesso' })
   async getDebugInfo() {
     try {
+      console.log('=== DEBUG INFO ===');
+      
       const debugInfo = this.debugService.getDebugInfo();
+      
+      console.log('Status do cliente:', { 
+        isReady: debugInfo.client.isReady, 
+        isInitializing: debugInfo.client.isInitializing 
+      });
+      console.log('Total de mensagens:', debugInfo.messages.total);
+      console.log('Total de grupos de chat:', debugInfo.chatGroups.total);
+      console.log('Last message ID:', debugInfo.messages.lastMessageId);
+      
+      // Detalhes dos grupos de chat
+      debugInfo.chatGroups.groups.forEach((group, index) => {
+        console.log(`Grupo ${index + 1}:`, {
+          chatId: group.chatId,
+          chatName: group.chatName,
+          messageCount: group.messageCount,
+          unreadCount: group.unreadCount,
+          lastMessage: group.lastMessage
+        });
+      });
+      
+      console.log('Últimas 5 mensagens:', debugInfo.messages.lastMessages);
+      console.log('=== FIM DEBUG ===');
       
       return {
         success: true,
