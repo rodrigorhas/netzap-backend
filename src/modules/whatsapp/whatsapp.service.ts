@@ -181,6 +181,33 @@ export class WhatsappService extends EventEmitter {
     return this.lastMessageId;
   }
 
+  async getMessageMedia(messageId: string): Promise<any> {
+    try {
+      const message = this.messages.find(msg => msg.id._serialized === messageId);
+      if (!message) {
+        throw new Error('Mensagem não encontrada');
+      }
+
+      if (!message.hasMedia || !message.downloadMedia) {
+        throw new Error('Mensagem não possui media');
+      }
+
+      const media = await message.downloadMedia();
+      return {
+        success: true,
+        data: {
+          mimetype: media.mimetype,
+          data: media.data,
+          filename: media.filename,
+          filesize: media.filesize,
+        }
+      };
+    } catch (error) {
+      this.logger.error('Erro ao buscar media da mensagem:', error);
+      throw error;
+    }
+  }
+
   async sendMessage(to: string, message: string): Promise<Message> {
     if (!this.isReady) {
       throw new Error('WhatsApp não está conectado');
@@ -199,7 +226,7 @@ export class WhatsappService extends EventEmitter {
     try {
       const chats = await this.client.getChats();
       for (const chat of chats) {
-        const messages = await chat.fetchMessages({ limit: 50 });
+        const messages = await chat.fetchMessages({ limit: 5 });
         this.messages.push(...messages);
       }
       await this.updateChatGroups();
@@ -247,7 +274,8 @@ export class WhatsappService extends EventEmitter {
       isFromMe: message.fromMe,
       chatId: message.fromMe ? message.to : message.from,
       chatName: message.fromMe ? message.to : message.from,
-      isGroup: false // Simplificado, pode ser melhorado
+      isGroup: false,
+      hasMedia: message.hasMedia,
     };
   }
 }

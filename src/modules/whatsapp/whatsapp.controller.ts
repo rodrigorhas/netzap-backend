@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, Param } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { WhatsappService } from './whatsapp.service';
 import { InitializeDto } from './dto/initialize.dto';
 
@@ -39,6 +39,25 @@ export class WhatsappController {
     } catch (error) {
       throw new HttpException(
         { success: false, error: 'Erro ao verificar status do WhatsApp' },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get('media/:messageId')
+  @ApiOperation({ summary: 'Buscar media de uma mensagem específica' })
+  @ApiParam({ name: 'messageId', description: 'ID da mensagem' })
+  @ApiResponse({ status: 200, description: 'Media da mensagem retornada com sucesso' })
+  async getMessageMedia(@Param('messageId') messageId: string) {
+    try {
+      const result = await this.whatsappService.getMessageMedia(messageId);
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        { 
+          success: false, 
+          error: error instanceof Error ? error.message : 'Erro ao buscar media da mensagem' 
+        },
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }

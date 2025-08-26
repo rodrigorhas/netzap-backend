@@ -9,6 +9,13 @@ export interface ChatMessage {
   chatId: string;
   chatName: string;
   isGroup: boolean;
+  media?: {
+    mimetype: string;
+    data: string; // base64
+    filename?: string;
+    filesize?: number;
+  };
+  hasMedia: boolean;
 }
 
 export interface ChatGroup {
