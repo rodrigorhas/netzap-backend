@@ -21,7 +21,7 @@ export class MessagesController {
   ) {
     try {
       if (chatId) {
-        const messages = this.messagesService.getChatMessages(chatId);
+        const messages = await this.messagesService.getChatMessages(chatId);
         
         return {
           success: true,
@@ -34,8 +34,8 @@ export class MessagesController {
         };
       }
       
-      const chatGroups = this.messagesService.getChatGroups();
-      const currentLastMessageId = this.messagesService.getLastMessageId();
+      const chatGroups = await this.messagesService.getChatGroups();
+      const currentLastMessageId = await this.messagesService.getLastMessageId();
       
       const hasNewMessages = lastMessageId !== currentLastMessageId;
       
@@ -80,7 +80,7 @@ export class MessagesController {
       
       // Se solicitado, marcar chat como lido
       if (markAsRead && to) {
-        this.messagesService.markChatAsRead(to);
+        await this.messagesService.markChatAsRead(to);
       }
       
       return {
@@ -115,7 +115,7 @@ export class MessagesController {
         );
       }
       
-      this.messagesService.markChatAsRead(chatId);
+      await this.messagesService.markChatAsRead(chatId);
       
       return {
         success: true,

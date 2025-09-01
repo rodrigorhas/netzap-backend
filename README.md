@@ -1,8 +1,38 @@
 # NetZap API
 
-API do projeto NetZap migrada para NestJS.
+API do projeto NetZap com persistência em PostgreSQL.
 
 ## 🚀 Instalação
+
+### Pré-requisitos
+- Node.js (versão 16 ou superior)
+- PostgreSQL (versão 12 ou superior)
+
+### Configuração do Banco de Dados
+
+1. **Configurar variáveis de ambiente:**
+   ```bash
+   # Copiar arquivo de exemplo
+   cp database.example.env .env
+   ```
+
+2. **Subir banco de dados com Docker:**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Verificar se o banco está rodando:**
+   ```bash
+   # Ver logs do PostgreSQL
+   npm run docker:logs
+   
+   # Acessar pgAdmin (se disponível)
+   # http://localhost:8080
+   # Email: admin@netzap.com
+   # Senha: admin123
+   ```
+
+### Executar a Aplicação
 
 ```bash
 # Instalar dependências
@@ -22,33 +52,21 @@ A documentação da API está disponível em: `http://localhost:3001/api`
 
 ## 🔧 Endpoints
 
-### WhatsApp
-- `GET /whatsapp` - Verificar status do WhatsApp
-- `POST /whatsapp` - Inicializar/desconectar WhatsApp
+### Estrutura das Tabelas
+- **`messages`**: Todas as mensagens do WhatsApp
+- **`chats`**: Informações dos chats e última mensagem
 
-### Messages
-- `GET /messages` - Buscar mensagens ou grupos de chat
-- `POST /messages` - Enviar mensagem
-- `PATCH /messages` - Marcar chat como lido
-
-### Debug
-- `GET /debug` - Informações de debug
-
-## 🔄 Migração do Next.js
-
-Esta API foi migrada do projeto Next.js original, mantendo a mesma funcionalidade mas com as vantagens do NestJS:
-
-- ✅ Estrutura modular
-- ✅ Injeção de dependências
-- ✅ Validação automática
-- ✅ Documentação automática (Swagger)
-- ✅ Melhor tratamento de erros
-- ✅ Testes mais fáceis
+### Acessos
+- **API**: http://localhost:3000
+- **pgAdmin**: http://localhost:8080 (admin@netzap.com / admin123)
+- **PostgreSQL**: localhost:5432
 
 ## 📦 Dependências Principais
 
 - NestJS
+- TypeORM (PostgreSQL)
 - WhatsApp Web.js
 - Socket.io
 - QRCode
 - Swagger
+- Docker

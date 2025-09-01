@@ -7,14 +7,14 @@ export class DebugService {
 
   constructor(private readonly whatsappService: WhatsappService) {}
 
-  getDebugInfo() {
+  async getDebugInfo() {
     this.logger.log('=== DEBUG INFO ===');
     
     const isReady = this.whatsappService.isClientReady();
     const isInitializing = this.whatsappService.getIsInitializing();
-    const messages = this.whatsappService.getMessages();
-    const chatGroups = this.whatsappService.getChatGroups();
-    const lastMessageId = this.whatsappService.getLastMessageId();
+    const messages = await this.whatsappService.getMessages();
+    const chatGroups = await this.whatsappService.getChatGroups();
+    const lastMessageId = await this.whatsappService.getLastMessageId();
     
     this.logger.log('Status do cliente:', { isReady, isInitializing });
     this.logger.log('Total de mensagens:', messages.length);
@@ -39,7 +39,7 @@ export class DebugService {
     
     // Últimas 5 mensagens
     const lastMessages = messages.slice(-5).map(msg => ({
-      id: msg.id?._serialized,
+      id: msg.id,
       from: msg.from,
       body: msg.body?.substring(0, 50),
       timestamp: msg.timestamp,

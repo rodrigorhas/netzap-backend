@@ -14,7 +14,7 @@ export class DebugController {
     try {
       console.log('=== DEBUG INFO ===');
       
-      const debugInfo = this.debugService.getDebugInfo();
+      const debugInfo = await this.debugService.getDebugInfo();
       
       console.log('Status do cliente:', { 
         isReady: debugInfo.client.isReady, 
